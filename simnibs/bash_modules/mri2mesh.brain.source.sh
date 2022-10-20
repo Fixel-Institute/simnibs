@@ -86,14 +86,14 @@ if $run_brainf; then
 	  e fslmaths $M2M_DIR/tmp/T1fs_roi_FS -mul $M2M_DIR/tmp/T2_regT1fs_roi_mask -add $M2M_DIR/tmp/T1fs_roi_FS \
 	  -div 2 $M2M_DIR/T1fs_roi_T2masked_FS
 
-	  e recon-all -i $M2M_DIR/T1fs_roi_T2masked_FS.nii.gz -s $FS_DIR
+	  e recon-all -i $M2M_DIR/T1fs_roi_T2masked_FS.nii.gz -s $FS_DIR -parallel -openmp 8
 	  T2PIAL=0
 	else
-	  e recon-all -i $M2M_DIR/tmp/T1fs_roi_FS.nii.gz -s $FS_DIR
+	  e recon-all -i $M2M_DIR/tmp/T1fs_roi_FS.nii.gz -s $FS_DIR -parallel -openmp 8
 	fi
 
 	if [ $T2PIAL = 0 ]; then
- 	  e recon-all -s $FS_DIR -all -3T -cubic -cm
+ 	  e recon-all -s $FS_DIR -all -3T -cubic -cm -parallel -openmp 8
 	else
 	  e echo 'using T2 to improve segmentation of pial surface'
 
@@ -109,8 +109,8 @@ if $run_brainf; then
 	  # cut neck
 	  e fslroi $M2M_DIR/T2.nii.gz $M2M_DIR/T2_roi 0 $df1 0 $df2 $zmin $zsize
 
-	  e recon-all -T2 $M2M_DIR/T2_roi.nii.gz -s $FS_DIR
-	  e recon-all -s $FS_DIR -all -3T -cubic -T2pial -cm
+	  e recon-all -T2 $M2M_DIR/T2_roi.nii.gz -s $FS_DIR -parallel -openmp 8
+	  e recon-all -s $FS_DIR -all -3T -cubic -T2pial -cm -parallel -openmp 8
 	fi;
 else SAY "skipping recon-all, using previous results to save time!"; fi
 
